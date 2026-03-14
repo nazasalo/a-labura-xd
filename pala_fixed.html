@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ey Máquina 🪣</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap');
+
+  :root {
+    --sky: #87CEEB;
+    --grass: #4CAF50;
+    --dirt: #8B5E3C;
+    --shovel-gray: #6B6B6B;
+    --shovel-dark: #3a3a3a;
+    --handle-red: #C0392B;
+    --handle-dark: #922B21;
+    --msg-bg: #FFF9C4;
+    --msg-border: #F9A825;
+    --text-dark: #1a1a1a;
+    --bubble-shadow: rgba(0,0,0,0.25);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(180deg, var(--sky) 0%, #b0e0f7 60%, var(--grass) 60%, #388E3C 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+    cursor: default;
+    position: relative;
+  }
+
+  /* Clouds */
+  .cloud {
+    position: absolute;
+    background: white;
+    border-radius: 50px;
+    opacity: 0.85;
+    animation: drift linear infinite;
+  }
+  .cloud::before, .cloud::after {
+    content: '';
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+  }
+  .cloud-1 { width: 120px; height: 40px; top: 8%; left: -150px; animation-duration: 22s; }
+  .cloud-1::before { width: 60px; height: 60px; top: -25px; left: 15px; }
+  .cloud-1::after { width: 45px; height: 45px; top: -15px; left: 55px; }
+  .cloud-2 { width: 90px; height: 30px; top: 18%; left: -120px; animation-duration: 30s; animation-delay: -10s; }
+  .cloud-2::before { width: 45px; height: 45px; top: -20px; left: 10px; }
+  .cloud-2::after { width: 35px; height: 35px; top: -12px; left: 40px; }
+  .cloud-3 { width: 100px; height: 35px; top: 5%; left: -130px; animation-duration: 26s; animation-delay: -5s; }
+  .cloud-3::before { width: 50px; height: 50px; top: -22px; left: 12px; }
+  .cloud-3::after { width: 40px; height: 40px; top: -14px; left: 47px; }
+
+  @keyframes drift {
+    from { transform: translateX(-200px); }
+    to { transform: translateX(110vw); }
+  }
+
+  /* Sun */
+  .sun {
+    position: absolute;
+    top: 5%;
+    right: 8%;
+    width: 70px; height: 70px;
+    background: radial-gradient(circle, #FFD700 60%, #FFA500 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 30px 10px rgba(255,220,0,0.4);
+    animation: sunPulse 3s ease-in-out infinite;
+  }
+  @keyframes sunPulse {
+    0%,100% { box-shadow: 0 0 30px 10px rgba(255,220,0,0.4); }
+    50% { box-shadow: 0 0 50px 20px rgba(255,220,0,0.6); }
+  }
+
+  /* Scene container */
+  .scene {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Speech bubble top */
+  .speech-top {
+    background: white;
+    border: 3px solid #ddd;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 8px;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+    position: relative;
+    opacity: 0;
+    animation: fadeInDown 0.6s ease 0.3s forwards;
+  }
+  .speech-top::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #ddd;
+  }
+  .speech-top::before {
+    content: '';
+    position: absolute;
+    bottom: -9px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: white;
+    z-index: 1;
+  }
+
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Shovel SVG wrapper */
+  .shovel-wrapper {
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.15s;
+    animation: bobbing 2.5s ease-in-out infinite;
+    margin: 15px 0;
+    filter: drop-shadow(4px 8px 12px rgba(0,0,0,0.3));
+  }
+
+  .shovel-wrapper:hover {
+    animation: none;
+    transform: scale(1.08) rotate(-3deg);
+  }
+  .shovel-wrapper:active {
+    transform: scale(0.95) rotate(5deg);
+  }
+
+  @keyframes bobbing {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(2deg); }
+  }
+
+  /* OK hand top */
+  .ok-hand {
+    position: absolute;
+    top: 50px;
+    right: 180px;
+    font-size: 3rem;
+    animation: wavingOk 1.5s ease-in-out infinite;
+    transform-origin: bottom center;
+    filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.2));
+  }
+  @keyframes wavingOk {
+    0%, 100% { transform: rotate(-10deg); }
+    50% { transform: rotate(15deg); }
+  }
+
+  /* Phone hand right */
+  .phone-hand {
+    position: absolute;
+    bottom: 60%;
+    right: -40px;
+    font-size: 2.2rem;
+    animation: phoneWiggle 2s ease-in-out infinite;
+    transform-origin: center;
+  }
+  @keyframes phoneWiggle {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(-15deg) scale(1.05); }
+    75% { transform: rotate(15deg) scale(1.05); }
+  }
+
+  /* Eyes on shovel */
+  .shovel-eyes {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+  }
+  .eye {
+    width: 25px; height: 25px;
+    background: white;
+    border-radius: 50%;
+    position: relative;
+    border: 2px solid #333;
+    animation: blink 4s ease-in-out infinite;
+  }
+  .eye::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 6px; height: 6px;
+    background: #1a1a1a;
+    border-radius: 50%;
+  }
+  @keyframes blink {
+    0%, 95%, 100% { transform: scaleY(1); }
+    97% { transform: scaleY(0.1); }
+  }
+
+  /* Smile */
+  .smile {
+    position: absolute;
+    top: 38%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px; height: 18px;
+    border-bottom: 3px solid #333;
+    border-radius: 0 0 20px 20px;
+  }
+
+  /* Cheeks */
+  .cheeks {
+    position: absolute;
+    top: 33%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 36px;
+  }
+  .cheek {
+    width: 14px; height: 8px;
+    background: rgba(255,150,150,0.5);
+    border-radius: 50%;
+  }
+
+  /* Message bubble on click */
+  .message-bubble {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: var(--msg-bg);
+    border: 4px solid var(--msg-border);
+    border-radius: 24px;
+    padding: 24px 40px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3), 0 0 0 8px rgba(249,168,37,0.2);
+    z-index: 100;
+    pointer-events: none;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .message-bubble.show {
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: all;
+  }
+  .message-bubble h2 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.2rem;
+    color: #E65100;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.08);
+    margin-bottom: 8px;
+  }
+  .message-bubble p {
+    font-size: 1rem;
+    color: #555;
+    font-weight: 700;
+  }
+  .message-bubble .emoji-row {
+    font-size: 2rem;
+    margin: 8px 0;
+  }
+  .close-btn {
+    margin-top: 14px;
+    background: #E65100;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 8px 24px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .close-btn:hover { background: #BF360C; transform: scale(1.05); }
+
+  /* Overlay */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 99;
+    backdrop-filter: blur(3px);
+  }
+  .overlay.show { display: block; }
+
+  /* Bottom label */
+  .bottom-label {
+    position: absolute;
+    bottom: 8%;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1rem;
+    color: rgba(255,255,255,0.8);
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    letter-spacing: 1px;
+  }
+
+  /* Tap hint */
+  .tap-hint {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.9);
+    font-weight: 700;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    margin-top: -5px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 0.7; }
+    50% { opacity: 1; }
+  }
+
+  /* Particles on click */
+  .particle {
+    position: fixed;
+    pointer-events: none;
+    font-size: 1.5rem;
+    animation: flyUp 1s ease-out forwards;
+    z-index: 200;
+  }
+  @keyframes flyUp {
+    0% { opacity: 1; transform: translate(0,0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.5); }
+  }
+</style>
+</head>
+<body>
+
+<div class="sun"></div>
+<div class="cloud cloud-1"></div>
+<div class="cloud cloud-2"></div>
+<div class="cloud cloud-3"></div>
+
+<div class="overlay" id="overlay" onclick="closeMsg()"></div>
+
+<div class="scene">
+  <div class="speech-top">Ey máquina... 👀</div>
+
+  <div class="shovel-wrapper" id="shovel" onclick="handleClick(event)">
+    <!-- OK hand top left -->
+    <div class="ok-hand">👌</div>
+    <!-- Phone hand right -->
+    <div class="phone-hand">🤙</div>
+
+    <!-- Shovel SVG -->
+    <svg width="180" height="240" viewBox="0 0 180 280" xmlns="http://www.w3.org/2000/svg">
+      <!-- Handle shadow -->
+      <ellipse cx="40" cy="268" rx="18" ry="6" fill="rgba(0,0,0,0.18)"/>
+      
+      <!-- Handle (red stick) -->
+      <rect x="83" y="155" width="14" height="115" rx="7" fill="#C0392B"/>
+      <rect x="86" y="155" width="4" height="115" rx="3" fill="#E74C3C" opacity="0.5"/>
+      
+      <!-- Handle base triangle (red) -->
+      <polygon points="70,248 112,248 91,272" fill="#922B21"/>
+      <polygon points="73,250 109,250 91,270" fill="#C0392B" opacity="0.7"/>
+
+      <!-- Shovel head shadow -->
+      <ellipse cx="93" cy="165" rx="68" ry="18" fill="rgba(0,0,0,0.15)" transform="translate(4,8)"/>
+      
+      <!-- Shovel blade (dark gray gradient) -->
+      <defs>
+        <linearGradient id="bladeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#8a8a8a"/>
+          <stop offset="40%" stop-color="#5a5a5a"/>
+          <stop offset="100%" stop-color="#3a3a3a"/>
+        </linearGradient>
+        <linearGradient id="shineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="rgba(255,255,255,0.15)"/>
+          <stop offset="50%" stop-color="rgba(255,255,255,0.35)"/>
+          <stop offset="100%" stop-color="rgba(255,255,255,0.05)"/>
+        </linearGradient>
+      </defs>
+      
+      <!-- Main blade shape (pentagon) -->
+      <polygon points="25,60 157,60 170,155 91,185 12,155" fill="url(#bladeGrad)"/>
+      <!-- Shine overlay -->
+      <polygon points="25,60 157,60 170,155 91,185 12,155" fill="url(#shineGrad)"/>
+      
+      <!-- Top edge highlight -->
+      <line x1="25" y1="60" x2="157" y2="60" stroke="rgba(255,255,255,0.4)" stroke-width="3" stroke-linecap="round"/>
+      
+      <!-- Center ridge -->
+      <line x1="91" y1="62" x2="91" y2="183" stroke="rgba(0,0,0,0.2)" stroke-width="2"/>
+      <line x1="90" y1="62" x2="90" y2="183" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+    </svg>
+
+    <!-- Face overlaid on blade -->
+    <div class="shovel-eyes">
+      <div class="eye"></div>
+      <div class="eye"></div>
+    </div>
+    <div class="smile"></div>
+    <div class="cheeks">
+      <div class="cheek"></div>
+      <div class="cheek"></div>
+    </div>
+  </div>
+
+  <div class="tap-hint">👆 ¡Tocame!</div>
+</div>
+
+<div class="message-bubble" id="msgBubble">
+  <div class="emoji-row">💼🔍📋</div>
+  <h2>¡Buscar un trabajo!</h2>
+  <p>¿No pensas agarrarme?</p>
+  <button class="close-btn" onclick="closeMsg()">Cerrar 😅</button>
+</div>
+
+<script>
+  function handleClick(e) {
+    // Show message
+    document.getElementById('overlay').classList.add('show');
+    document.getElementById('msgBubble').classList.add('show');
+
+    // Spawn particles
+    const emojis = ['💼','📋','🔍','💪','😅','🪣','✨','💡'];
+    for (let i = 0; i < 8; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.textContent = emojis[i % emojis.length];
+      const tx = (Math.random() - 0.5) * 200;
+      const ty = -(Math.random() * 150 + 50);
+      p.style.setProperty('--tx', tx + 'px');
+      p.style.setProperty('--ty', ty + 'px');
+      p.style.left = e.clientX + (Math.random()-0.5)*40 + 'px';
+      p.style.top = e.clientY + (Math.random()-0.5)*40 + 'px';
+      p.style.animationDelay = (Math.random() * 0.2) + 's';
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 1200);
+    }
+  }
+
+  function closeMsg() {
+    document.getElementById('overlay').classList.remove('show');
+    document.getElementById('msgBubble').classList.remove('show');
+  }
+</script>
+</body>
+</html>
